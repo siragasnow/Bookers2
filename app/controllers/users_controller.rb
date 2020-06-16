@@ -14,13 +14,21 @@ class UsersController < ApplicationController
   end
 
   def edit
-  	@user = User.find(params[:id])
+    @user = User.find(params[:id])
+    unless current_user.id == @user.id
+      redirect_to user_path(current_user.id)
+    end
   end
 
   def update
-  	@user = User.find(params[:id])
-  	@user.update(user_params)
-  	redirect_to user_path(@user.id)
+  	@user = current_user
+  	if @user.update(user_params)
+       flash[:notice] = "Your information update successfully."
+  	   redirect_to user_path(@user.id)
+    else
+      @user = current_user
+      render action: :edit
+    end
   end
 
   private
